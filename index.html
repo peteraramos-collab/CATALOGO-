@@ -2,163 +2,595 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Ges-in | Catálogo Profesional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Ges-in | Recorrido Virtual 360° Profesional</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
-        :root { --azul: #3498db; --oscuro: #1a1a1a; --oro: #f1c40f; --verde: #25d366; }
-        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
-
-        /* Panel Lateral */
-        #sidebar {
-            position: fixed; top: 0; left: 0; width: 300px; height: 100%;
-            background: var(--oscuro); color: white; z-index: 2000;
-            display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+        :root { 
+            --azul: #3498db; 
+            --oscuro: #1a1a1a; 
+            --oro: #f1c40f; 
+            --verde: #25d366;
+            --gris-claro: #ecf0f1;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000; 
         }
 
-        .header-logo { padding: 15px; text-align: center; background: white; }
-        .header-logo img { max-width: 130px; height: auto; }
+        /* Panel Lateral Mejorado */
+        #sidebar {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 320px; 
+            height: 100%;
+            background: linear-gradient(135deg, var(--oscuro) 0%, #2c3e50 100%);
+            color: white; 
+            z-index: 2000;
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+        }
 
-        #lista-propiedades { flex-grow: 1; overflow-y: auto; padding: 15px; }
+        /* Botón para colapsar en móvil */
+        .toggle-sidebar {
+            position: fixed;
+            left: 10px;
+            top: 10px;
+            background: var(--azul);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 2001;
+            cursor: pointer;
+            display: none;
+            font-size: 18px;
+        }
+
+        .header-logo { 
+            padding: 20px; 
+            text-align: center; 
+            background: white;
+            border-bottom: 3px solid var(--oro);
+        }
+        
+        .header-logo img { 
+            max-width: 150px; 
+            height: auto; 
+        }
+
+        #lista-propiedades { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 15px;
+            max-height: calc(100% - 180px);
+        }
+
+        /* Scroll personalizado */
+        #lista-propiedades::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #lista-propiedades::-webkit-scrollbar-track {
+            background: #2c3e50;
+        }
+        
+        #lista-propiedades::-webkit-scrollbar-thumb {
+            background: var(--azul);
+            border-radius: 4px;
+        }
 
         .card {
-            background: #2c3e50; padding: 12px; margin-bottom: 10px;
-            border-radius: 8px; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s;
+            background: rgba(52, 73, 94, 0.9);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
-        .card.active { border-left-color: var(--azul); background: #34495e; }
+        
+        .card:hover {
+            transform: translateX(5px);
+            background: #34495e;
+        }
+        
+        .card.active { 
+            border-left-color: var(--oro); 
+            background: #2c3e50;
+            box-shadow: 0 2px 10px rgba(241, 196, 15, 0.2);
+        }
+        
+        .card strong {
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .card small {
+            color: var(--oro);
+            font-size: 0.85em;
+        }
 
         .btn-publicar {
-            background: var(--oro); color: #000; text-align: center;
-            padding: 12px; margin: 10px 15px; border-radius: 8px;
-            font-weight: bold; text-decoration: none; display: block; font-size: 0.9em;
+            background: var(--oro);
+            color: #000;
+            text-align: center;
+            padding: 12px;
+            margin: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-publicar:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3);
         }
 
         /* Galería mejorada */
-        .galeria-minis { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+        .galeria-minis { 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 8px; 
+            margin-top: 12px; 
+        }
+        
         .mini { 
-            width: 70px; height: 50px; border-radius: 4px; cursor: pointer; 
-            border: 2px solid transparent; object-fit: cover; transition: 0.2s;
+            width: 100%;
+            height: 60px;
+            border-radius: 6px; 
+            cursor: pointer; 
+            border: 2px solid transparent; 
+            object-fit: cover; 
+            transition: all 0.2s ease;
         }
-        .mini:hover { border-color: var(--oro); transform: scale(1.05); }
+        
+        .mini:hover { 
+            border-color: var(--oro); 
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
 
-        .info-box { background: #000; padding: 15px; font-size: 0.85em; border-top: 1px solid #444; }
+        .info-box { 
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            font-size: 0.9em;
+            border-top: 2px solid var(--oro);
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-box h3 {
+            margin-bottom: 8px;
+        }
+        
         .btn-wa {
-            display: block; text-align: center; background: var(--verde); color: white;
-            text-decoration: none; padding: 12px; border-radius: 5px; margin-top: 8px; font-weight: bold;
+            display: block;
+            text-align: center;
+            background: var(--verde);
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-wa:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 10px rgba(37, 211, 102, 0.5);
         }
 
-        /* Ventana Emergente (MODAL) */
+        /* Modal mejorado */
         #modal-visor {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 5000; justify-content: center; align-items: center;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 5000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
         }
-        #modal-img { max-width: 85%; max-height: 85%; border: 3px solid white; border-radius: 5px; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        #modal-img { 
+            max-width: 90%; 
+            max-height: 90%; 
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
         #btn-cerrar {
-            position: absolute; top: 20px; right: 30px; color: white; font-size: 40px;
-            font-weight: bold; cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 45px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        #btn-cerrar:hover {
+            transform: rotate(90deg);
+            background: rgba(255,0,0,0.5);
         }
 
-        #auspiciantes {
-            position: fixed; top: 0; right: 0; width: calc(100% - 300px);
-            height: 60px; background: rgba(255,255,255,0.9);
-            z-index: 1500; display: flex; align-items: center; justify-content: flex-end;
-            padding-right: 20px;
+        /* Indicador de carga */
+        .loading-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: var(--oro);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 2000;
+            display: none;
         }
-        #auspiciantes img { height: 35px; margin-left: 15px; }
 
-        @media (max-width: 600px) {
-            #sidebar { width: 100%; height: 45%; bottom: 0; top: auto; }
-            #auspiciantes { width: 100%; height: 45px; }
+        /* Botón de ayuda */
+        .help-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--azul);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2000;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .help-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Tooltip de ayuda */
+        .tooltip {
+            position: fixed;
+            bottom: 70px;
+            left: 20px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            max-width: 250px;
+            z-index: 2000;
+            display: none;
+            pointer-events: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toggle-sidebar {
+                display: block;
+            }
+            
+            #sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            #sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .galeria-minis {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+            
+            .mini {
+                height: 50px;
+            }
+        }
+        
+        /* Animación de transición para 360 */
+        .sky-fade {
+            transition: opacity 0.5s ease;
         }
     </style>
 </head>
 <body>
 
-    <div id="modal-visor">
-        <span id="btn-cerrar" onclick="cerrarDetalle()">&times;</span>
-        <img id="modal-img" src="">
+    <!-- Botón toggle para móvil -->
+    <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+    
+    <!-- Botón de ayuda -->
+    <div class="help-btn" onclick="showHelp()">?</div>
+    <div class="tooltip" id="tooltip">
+        🖱️ Haz clic y arrastra para explorar 360°<br>
+        📸 Haz clic en las miniaturas para ampliar
     </div>
+    
+    <!-- Indicador de carga -->
+    <div class="loading-indicator" id="loading">🔄 Cargando vista 360°...</div>
 
-    <div id="auspiciantes">
-        <span style="color:#666; font-size: 11px; font-weight: bold;">ALIADOS:</span>
-        <img src="logo1.png">
-        <img src="logo2.png">
+    <div id="modal-visor" onclick="cerrarDetalle()">
+        <span id="btn-cerrar" onclick="event.stopPropagation(); cerrarDetalle()">&times;</span>
+        <img id="modal-img" src="" onclick="event.stopPropagation()">
     </div>
 
     <div id="sidebar">
-        <div class="header-logo"><img src="Gesin.png"></div>
-        <a href="https://wa.me/593995042091?text=Quiero%20publicar%20mi%20terreno" class="btn-publicar" target="_blank">¡PUBLICA AQUÍ!</a>
+        <div class="header-logo">
+            <img src="Gesin.png" alt="Ges-in Logo" onerror="this.src='https://via.placeholder.com/150x60?text=Ges-in'">
+        </div>
+        <a href="https://wa.me/593984180470?text=Quiero%20publicar%20mi%20terreno" class="btn-publicar" target="_blank">
+            📢 ¡PUBLICA TU PROPIEDAD AQUÍ!
+        </a>
         <div id="lista-propiedades"></div>
         <div class="info-box">
-            <h3 id="p-titulo" style="margin:0; color: var(--oro);">Cargando...</h3>
+            <h3 id="p-titulo" style="margin:0; color: var(--oro);">Selecciona una propiedad</h3>
             <p id="p-desc" style="opacity: 0.8; margin: 8px 0;"></p>
             <div id="p-specs" style="color: var(--azul); font-weight: bold;"></div>
             <div class="galeria-minis" id="p-galeria"></div>
-            <a href="#" id="btn-whatsapp-link" class="btn-wa" target="_blank">WhatsApp</a>
+            <a href="#" id="btn-whatsapp-link" class="btn-wa" target="_blank">
+                💬 Consultar por WhatsApp
+            </a>
         </div>
     </div>
 
-    <a-scene renderer="exposure: 1.2;">
+    <a-scene renderer="exposure: 1.2; logarithmicDepthBuffer: true;">
         <a-assets>
-            <img id="360_1" src="1.jpeg" crossorigin="anonymous">
-            <img id="360_2" src="2.jpeg" crossorigin="anonymous">
-            <img id="360_3" src="3.jpeg" crossorigin="anonymous">
+            <!-- Imágenes 360 - Reemplaza con tus URLs reales -->
+            <img id="360_1" src="1.jpeg" crossorigin="anonymous" onerror="console.warn('No se pudo cargar 1.jpeg')">
+            <img id="360_2" src="2.jpeg" crossorigin="anonymous" onerror="console.warn('No se pudo cargar 2.jpeg')">
+            <img id="360_3" src="3.jpeg" crossorigin="anonymous" onerror="console.warn('No se pudo cargar 3.jpeg')">
+            <img id="360_4" src="4.jpeg" crossorigin="anonymous" onerror="console.warn('No se pudo cargar 4.jpeg')">
         </a-assets>
+        
+        <!-- Sky con efecto de transición -->
         <a-sky id="main-sky" rotation="0 -90 0" shader="flat" src="#360_1"></a-sky>
-        <a-entity camera look-controls><a-cursor color="var(--oro)"></a-cursor></a-entity>
+        
+        <!-- Cámara con mejor control -->
+        <a-entity camera look-controls="pointerLockEnabled: true" position="0 1.6 0">
+            <a-cursor color="var(--oro)" fuse="true" fuse-timeout="2000"></a-cursor>
+        </a-entity>
+        
+        <!-- Puntos de interés (ejemplo) -->
+        <a-entity id="hotspots"></a-entity>
     </a-scene>
 
     <script>
-        const MI_WHATSAPP = "593995042091";
+        const MI_WHATSAPP = "593984180470";
+        
+        // Catálogo mejorado con más información
         const catalogo = [
-            { titulo: "Propiedad Lote 1", desc: "Gran potencial agrícola.", specs: "Sector Pacto | 9 Ha", foto: "#360_1", extras: ["a.jpg", "b.jpg"] },
-            { titulo: "Propiedad Lote 2", desc: "Ubicación estratégica.", specs: "Sector Centro | 600m2", foto: "#360_2", extras: ["c.jpg", "d.jpg"] },
-            { titulo: "Propiedad Lote 3", desc: "Desarrollo comercial.", specs: "Vía Principal", foto: "#360_3", extras: ["a.jpg", "d.jpg"] }
+            { 
+                titulo: "🌄 Propiedad Vista Hermosa", 
+                desc: "Terreno con vistas panorámicas ideales para agricultura y desarrollo ecoturístico. Suelo fértil y acceso directo.", 
+                specs: "📍 Sector Pacto | 9 Hectáreas | $45,000",
+                precio: "$45,000",
+                foto: "#360_1", 
+                extras: ["a.jpg", "b.jpg", "c.jpg"],
+                ubicacion: "Pacto, Ecuador"
+            },
+            { 
+                titulo: "🏢 Terreno Comercial Centro", 
+                desc: "Ubicación privilegiada en el centro urbano. Alto flujo vehicular, ideal para negocio o desarrollo inmobiliario.", 
+                specs: "📍 Sector Centro | 600m² | $120,000",
+                precio: "$120,000",
+                foto: "#360_2", 
+                extras: ["c.jpg", "d.jpg", "e.jpg"],
+                ubicacion: "Centro Histórico"
+            },
+            { 
+                titulo: "🏭 Lote Industrial", 
+                desc: "Perfecto para bodegas o industria ligera. Cerca de vía principal y con todos los servicios disponibles.", 
+                specs: "📍 Vía Principal | 2,500m² | $85,000",
+                precio: "$85,000",
+                foto: "#360_3", 
+                extras: ["a.jpg", "d.jpg", "f.jpg"],
+                ubicacion: "Zona Industrial"
+            },
+            { 
+                titulo: "🌿 Reserva Ecológica", 
+                desc: "Área de conservación con potencial para cabañas ecológicas. Bosque secundario y vertiente de agua.", 
+                specs: "📍 Reserva Natural | 15 Hectáreas | Consultar",
+                precio: "Consultar",
+                foto: "#360_4", 
+                extras: ["g.jpg", "h.jpg", "i.jpg"],
+                ubicacion: "Zona de Reserva"
+            }
         ];
 
+        let currentIndex = 0;
+
         function renderizarMenu() {
+            const container = document.getElementById('lista-propiedades');
+            container.innerHTML = '';
+            
             catalogo.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = 'card';
-                div.innerHTML = `<strong>${item.titulo}</strong>`;
-                div.onclick = () => seleccionar(index, div);
-                document.getElementById('lista-propiedades').appendChild(div);
+                div.innerHTML = `
+                    <strong>${item.titulo}</strong>
+                    <small>${item.precio}</small>
+                `;
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    seleccionar(index, div);
+                };
+                container.appendChild(div);
             });
+            
+            // Seleccionar primera propiedad por defecto
+            if(catalogo.length > 0) {
+                setTimeout(() => {
+                    const firstCard = document.querySelector('.card');
+                    if(firstCard) seleccionar(0, firstCard);
+                }, 100);
+            }
+        }
+
+        function mostrarCargando(show) {
+            const loader = document.getElementById('loading');
+            if(show) {
+                loader.style.display = 'block';
+            } else {
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }
         }
 
         function seleccionar(index, elemento) {
+            if(index === currentIndex) return;
+            currentIndex = index;
             const p = catalogo[index];
-            document.querySelector('#main-sky').setAttribute('src', p.foto);
-            document.getElementById('p-titulo').innerText = p.titulo;
+            
+            mostrarCargando(true);
+            
+            // Cambiar imagen 360 con efecto
+            const sky = document.querySelector('#main-sky');
+            const oldSrc = sky.getAttribute('src');
+            
+            // Aplicar transición suave
+            sky.setAttribute('src', p.foto);
+            
+            // Mostrar información actualizada
+            document.getElementById('p-titulo').innerHTML = p.titulo;
             document.getElementById('p-desc').innerText = p.desc;
-            document.getElementById('p-specs').innerText = p.specs;
-
+            document.getElementById('p-specs').innerHTML = `💰 ${p.specs}`;
+            
+            // Actualizar galería de imágenes
             const galeria = document.getElementById('p-galeria');
             galeria.innerHTML = "";
-            p.extras.forEach(imgUrl => {
-                const img = document.createElement('img');
-                img.src = imgUrl;
-                img.className = 'mini';
-                img.onclick = () => verDetalle(imgUrl); // Nueva función
-                galeria.appendChild(img);
-            });
-
-            const msg = `Hola Ges-in, info sobre: ${p.titulo}`;
+            
+            if(p.extras && p.extras.length > 0) {
+                p.extras.forEach(imgUrl => {
+                    const img = document.createElement('img');
+                    img.src = imgUrl;
+                    img.className = 'mini';
+                    img.alt = "Vista adicional";
+                    img.onload = () => img.style.opacity = '1';
+                    img.onerror = () => img.src = 'https://via.placeholder.com/70x50?text=No+image';
+                    img.onclick = (e) => {
+                        e.stopPropagation();
+                        verDetalle(imgUrl);
+                    };
+                    galeria.appendChild(img);
+                });
+            } else {
+                galeria.innerHTML = '<p style="font-size:11px; opacity:0.7;">📸 Sin imágenes adicionales</p>';
+            }
+            
+            // Mensaje personalizado para WhatsApp
+            const msg = `Hola Ges-in, estoy interesado en: ${p.titulo}\n📍 ${p.ubicacion}\n💰 ${p.precio}\n¿Podrían darme más información?`;
             document.getElementById('btn-whatsapp-link').href = `https://wa.me/${MI_WHATSAPP}?text=${encodeURIComponent(msg)}`;
+            
+            // Actualizar clase activa
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            elemento.classList.add('active');
+            if(elemento) elemento.classList.add('active');
+            
+            // Ocultar loader después de un tiempo
+            setTimeout(() => mostrarCargando(false), 500);
         }
 
-        // Funciones del Modal
         function verDetalle(src) {
-            document.getElementById('modal-img').src = src;
-            document.getElementById('modal-visor').style.display = "flex";
+            const modal = document.getElementById('modal-visor');
+            const modalImg = document.getElementById('modal-img');
+            modalImg.src = src;
+            modalImg.onerror = () => modalImg.src = 'https://via.placeholder.com/800x600?text=Imagen+no+disponible';
+            modal.style.display = "flex";
+            
+            // Prevenir scroll del body
+            document.body.style.overflow = 'hidden';
         }
 
         function cerrarDetalle() {
             document.getElementById('modal-visor').style.display = "none";
+            document.body.style.overflow = '';
         }
 
-        window.onload = () => { renderizarMenu(); seleccionar(0, document.querySelector('.card')); };
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        function showHelp() {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.style.display = 'block';
+            setTimeout(() => {
+                tooltip.style.display = 'none';
+            }, 4000);
+        }
+
+        // Cerrar sidebar al hacer click fuera (en móvil)
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.toggle-sidebar');
+            
+            if(window.innerWidth <= 768) {
+                if(!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    if(sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                    }
+                }
+            }
+        });
+
+        // Tecla ESC para cerrar modal
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'Escape') {
+                cerrarDetalle();
+            }
+        });
+
+        // Mensaje de bienvenida
+        window.onload = () => {
+            renderizarMenu();
+            setTimeout(() => {
+                console.log('🎉 Ges-in 360° Virtual Tour - Cargado exitosamente');
+                showHelp(); // Mostrar ayuda al inicio
+            }, 1000);
+        };
+        
+        // Manejo de errores de imágenes 360
+        window.addEventListener('error', function(e) {
+            if(e.target.tagName === 'IMG' && e.target.id && e.target.id.startsWith('360_')) {
+                console.warn(`Error cargando imagen 360: ${e.target.src}`);
+            }
+        });
     </script>
 </body>
 </html>
