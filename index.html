@@ -50,12 +50,11 @@
             z-index: 1500; display: flex; align-items: center; justify-content: flex-end;
             padding-right: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        #auspiciantes span { color: #666; font-size: 12px; margin-right: 15px; font-weight: bold; }
-        #auspiciantes img { height: 40px; margin-left: 15px; filter: grayscale(1); transition: 0.3s; }
-        #auspiciantes img:hover { filter: grayscale(0); }
+        #auspiciantes span { color: #666; font-size: 11px; margin-right: 15px; font-weight: bold; }
+        #auspiciantes img { height: 35px; margin-left: 15px; }
 
         @media (max-width: 600px) {
-            #sidebar { width: 100%; height: 40%; top: auto; bottom: 0; }
+            #sidebar { width: 100%; height: 45%; top: auto; bottom: 0; }
             #auspiciantes { width: 100%; top: 0; left: 0; height: 50px; }
         }
     </style>
@@ -63,9 +62,9 @@
 <body>
 
     <div id="auspiciantes">
-        <span>AUSPICIADO POR:</span>
+        <span>ALIADOS ESTRATÉGICOS:</span>
         <img src="logo1.png" alt="Auspiciante 1">
-        <img src="logo22.png" alt="Auspiciante 2">
+        <img src="logo2.png" alt="Auspiciante 2">
     </div>
 
     <div id="sidebar">
@@ -73,14 +72,14 @@
             <img src="Gesin.png" alt="Logo Ges-in">
         </div>
 
-        <a href="https://wa.me/593XXXXXXXXX?text=Hola%20Ges-in,%20quiero%20publicar%20mi%20terreno" class="btn-publicar" target="_blank">
+        <a href="https://wa.me/593984180470?text=Hola%20Ges-in,%20quiero%20publicar%20mi%20terreno" class="btn-publicar" target="_blank">
             ¡PUBLICA TU TERRENO AQUÍ!
         </a>
         
         <div id="lista-propiedades"></div>
 
         <div class="info-box">
-            <h3 id="p-titulo" style="margin:0; color: var(--oro);">Cargando...</h3>
+            <h3 id="p-titulo" style="margin:0; color: var(--oro);">Seleccione propiedad</h3>
             <p id="p-desc" style="opacity: 0.8; margin: 8px 0;"></p>
             <div id="p-specs" style="font-weight: bold; color: var(--azul);"></div>
             
@@ -92,12 +91,12 @@
 
     <a-scene renderer="colorManagement: false; exposure: 1.2;">
         <a-assets>
-            <img id="img_mifoto" src="mifoto.jpeg" crossorigin="anonymous">
-            <img id="img_1" src="1.jpeg" crossorigin="anonymous">
-            <img id="img_2" src="2.jpeg" crossorigin="anonymous">
+            <img id="360_1" src="1.jpeg" crossorigin="anonymous">
+            <img id="360_2" src="2.jpeg" crossorigin="anonymous">
+            <img id="360_3" src="3.jpeg" crossorigin="anonymous">
         </a-assets>
 
-        <a-sky id="main-sky" rotation="0 -90 0" shader="flat" src="#img_mifoto"></a-sky>
+        <a-sky id="main-sky" rotation="0 -90 0" shader="flat" src="#360_1"></a-sky>
         
         <a-entity camera look-controls>
             <a-cursor color="var(--oro)"></a-cursor>
@@ -105,30 +104,29 @@
     </a-scene>
 
     <script>
-        // CONFIGURACIÓN DE WHATSAPP (Pon tu número aquí sin el +)
-        const MI_WHATSAPP = "593995042091"; 
+        const MI_WHATSAPP = "593984180470"; // Cambié el número al que tenías registrado
 
         const catalogo = [
             { 
-                titulo: "Oficina Matriz", 
-                desc: "Sede administrativa de Ges-in.", 
-                specs: "San Miguel de los Bancos", 
-                foto: "#img_mifoto",
-                extras: ["3.jpg", "4.jpeg"] // Fotos comunes
-            },
-            { 
                 titulo: "Propiedad Lote 1", 
-                desc: "Terreno ideal para agricultura.", 
+                desc: "Terreno con gran potencial en el Noroccidente.", 
                 specs: "Sector Pacto | 9 Ha", 
-                foto: "#img_1",
-                extras: ["5.jpeg", "lote1_entrada.jpeg"]
+                foto: "#360_1",
+                extras: ["a.jpg", "b.jpg"] // Fotos comunes asociadas
             },
             { 
                 titulo: "Propiedad Lote 2", 
-                desc: "Lote urbano céntrico.", 
+                desc: "Ubicación estratégica y servicios básicos.", 
                 specs: "Sector Centro | 600m2", 
-                foto: "#img_2",
-                extras: ["6.jpeg"]
+                foto: "#360_2",
+                extras: ["c.jpg", "d.jpg"]
+            },
+            { 
+                titulo: "Propiedad Lote 3", 
+                desc: "Espacio ideal para desarrollo comercial o vivienda.", 
+                specs: "Vía Principal", 
+                foto: "#360_3",
+                extras: ["a.jpg", "d.jpg"]
             }
         ];
 
@@ -147,29 +145,23 @@
 
         function seleccionar(index, elemento) {
             const p = catalogo[index];
-            
-            // Cambiar Foto 360
             sky.setAttribute('src', p.foto);
             
-            // Actualizar Textos
             document.getElementById('p-titulo').innerText = p.titulo;
             document.getElementById('p-desc').innerText = p.desc;
             document.getElementById('p-specs').innerText = p.specs;
 
-            // Actualizar Galería de Detalles
             const galeria = document.getElementById('p-galeria');
             galeria.innerHTML = "";
             p.extras.forEach(imgUrl => {
                 const img = document.createElement('img');
                 img.src = imgUrl;
                 img.className = 'mini';
-                img.title = "Click para ver detalle";
                 img.onclick = () => window.open(imgUrl, '_blank');
                 galeria.appendChild(img);
             });
 
-            // Configurar WhatsApp dinámico
-            const mensaje = `Hola Ges-in, me interesa recibir más información sobre la propiedad: ${p.titulo}`;
+            const mensaje = `Hola Ges-in, me interesa recibir más información sobre: ${p.titulo}`;
             document.getElementById('btn-whatsapp-link').href = `https://wa.me/${MI_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
 
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
