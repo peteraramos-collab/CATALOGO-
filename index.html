@@ -2,13 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Ges-in | Visualizador 360</title>
+    <title>Ges-in | Catálogo 360 Pro</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
         :root { --azul: #3498db; --oscuro: #1a1a1a; --oro: #f1c40f; }
-        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background-color: #000; }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
 
-        /* Panel Lateral */
         #sidebar {
             position: fixed; top: 0; left: 0; width: 280px; height: 100%;
             background: var(--oscuro); color: white; z-index: 2000;
@@ -22,7 +21,7 @@
 
         .card {
             background: #2c3e50; padding: 12px; margin-bottom: 10px;
-            border-radius: 8px; cursor: pointer; border-left: 4px solid transparent;
+            border-radius: 8px; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s;
         }
 
         .card:hover { background: #34495e; border-left-color: var(--oro); }
@@ -35,67 +34,64 @@
             text-decoration: none; padding: 10px; border-radius: 5px; margin-top: 8px; font-weight: bold;
         }
 
-        /* Mensaje de carga para el usuario */
-        #status-msg {
-            position: fixed; top: 10px; right: 10px;
-            background: rgba(0,0,0,0.6); color: white;
-            padding: 5px 15px; border-radius: 20px; font-size: 12px; z-index: 3000;
+        #loader {
+            position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.7);
+            color: var(--oro); padding: 8px 15px; border-radius: 20px; font-size: 12px; z-index: 3000;
         }
     </style>
 </head>
 <body>
 
-    <div id="status-msg">Cargando experiencia...</div>
+    <div id="loader">Esperando selección...</div>
 
     <div id="sidebar">
         <div class="header-logo">
-            <img src="Gesin.png" alt="Logo">
+            <img src="Gesin.png" alt="Logo Ges-in">
         </div>
         
         <div id="lista-propiedades"></div>
 
         <div class="info-box">
             <h3 id="p-titulo" style="margin:0; color: var(--oro);">Gestiones Integrales</h3>
-            <p id="p-desc" style="opacity: 0.8; margin: 8px 0;">Seleccione un lote para visualizarlo en 360°.</p>
+            <p id="p-desc" style="opacity: 0.8; margin: 8px 0;">Seleccione una propiedad para iniciar el recorrido.</p>
             <div id="p-specs" style="font-weight: bold; color: var(--azul); margin-bottom: 5px;"></div>
-            <a href="https://wa.me/tu_numero" class="btn-wa" target="_blank">Consultar WhatsApp</a>
+            <a href="https://wa.me/tu_numero" class="btn-wa" target="_blank">Consultar por WhatsApp</a>
         </div>
     </div>
 
-    <a-scene loading-screen="dotsColor: gold; backgroundColor: black">
-        <a-sky id="main-sky" color="#333" rotation="0 -90 0"></a-sky>
+    <a-scene renderer="antialias: true; colorManagement: true;">
+        <a-sky id="main-sky" rotation="0 -90 0" color="#111"></a-sky>
         
-        <a-entity camera look-controls="magicWindowTrackingEnabled: false">
+        <a-entity camera look-controls="pointerLockEnabled: false">
             <a-cursor color="var(--oro)"></a-cursor>
         </a-entity>
     </a-scene>
 
     <script>
-        // CONFIGURACIÓN DE RUTAS - Verifica que los nombres en GitHub sean EXACTOS
         const catalogo = [
             {
                 titulo: "Oficina Matriz",
-                desc: "Sede administrativa en San Miguel de los Bancos.",
-                specs: "Matriz Ges-in",
+                desc: "Sede administrativa de Gestiones Integrales.",
+                specs: "San Miguel de los Bancos",
                 archivo: "mifoto.jpeg" 
             },
             {
                 titulo: "Propiedad Lote 1",
-                desc: "Terreno con gran proyección económica.",
-                specs: "Sector Pacto | 9 Ha",
+                desc: "Vista aérea capturada con DJI Mini 3.",
+                specs: "Sector Pacto | 9 Hectáreas",
                 archivo: "1.jpeg" 
             },
             {
                 titulo: "Propiedad Lote 2",
-                desc: "Lote urbano con servicios básicos.",
-                specs: "Sector Centro | 600m2",
+                desc: "Lote listo para desarrollo.",
+                specs: "Sector Centro | 600m²",
                 archivo: "2.jpeg" 
             }
         ];
 
         const contenedor = document.getElementById('lista-propiedades');
         const sky = document.querySelector('#main-sky');
-        const status = document.getElementById('status-msg');
+        const loader = document.getElementById('loader');
 
         function renderizarMenu() {
             catalogo.forEach((item, index) => {
@@ -109,31 +105,37 @@
 
         function seleccionar(index, elemento) {
             const p = catalogo[index];
-            status.innerText = "Cargando: " + p.archivo + "...";
-            
-            // CAMBIO DIRECTO DE ATRIBUTO (Solución de compatibilidad)
-            sky.setAttribute('src', p.archivo);
-            
-            // Actualizar Textos
-            document.getElementById('p-titulo').innerText = p.titulo;
-            document.getElementById('p-desc').innerText = p.desc;
-            document.getElementById('p-specs').innerText = p.specs;
+            loader.style.display = "block";
+            loader.innerText = "Cargando panorama...";
 
-            // Clases de menú
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            elemento.classList.add('active');
+            // TRUCO PARA GITHUB: Forzamos la recarga del src
+            sky.setAttribute('src', ''); // Limpiamos primero
+            
+            // Usamos una pequeña demora para asegurar que el motor gráfico procese el cambio
+            setTimeout(() => {
+                sky.setAttribute('src', p.archivo);
+                
+                // Actualizar interfaz
+                document.getElementById('p-titulo').innerText = p.titulo;
+                document.getElementById('p-desc').innerText = p.desc;
+                document.getElementById('p-specs').innerText = p.specs;
 
-            // Quitar mensaje de carga tras un momento
-            setTimeout(() => { status.innerText = "Vista: " + p.titulo; }, 2000);
+                // Estética del menú
+                document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+                elemento.classList.add('active');
+                
+                loader.innerText = "Vista: " + p.titulo;
+            }, 100);
         }
 
-        // Iniciar
         window.onload = () => {
             renderizarMenu();
-            // Intentar cargar la primera imagen
+            // Cargar la primera automáticamente después de un segundo
             setTimeout(() => {
-                seleccionar(0, document.querySelector('.card'));
-            }, 500);
+                if(document.querySelector('.card')) {
+                    seleccionar(0, document.querySelector('.card'));
+                }
+            }, 1000);
         };
     </script>
 </body>
