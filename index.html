@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Ges-in | Plataforma Inmobiliaria</title>
+    <title>Ges-in | Catálogo Profesional</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
         :root { --azul: #3498db; --oscuro: #1a1a1a; --oro: #f1c40f; --verde: #25d366; }
-        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #fff; }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
 
         /* Panel Lateral */
         #sidebar {
@@ -16,7 +16,7 @@
         }
 
         .header-logo { padding: 15px; text-align: center; background: white; }
-        .header-logo img { max-width: 140px; height: auto; }
+        .header-logo img { max-width: 130px; height: auto; }
 
         #lista-propiedades { flex-grow: 1; overflow-y: auto; padding: 15px; }
 
@@ -26,112 +26,94 @@
         }
         .card.active { border-left-color: var(--azul); background: #34495e; }
 
-        /* Botón Publicar Terreno */
         .btn-publicar {
             background: var(--oro); color: #000; text-align: center;
             padding: 12px; margin: 10px 15px; border-radius: 8px;
-            font-weight: bold; text-decoration: none; display: block;
+            font-weight: bold; text-decoration: none; display: block; font-size: 0.9em;
         }
 
-        /* Galería de Detalles */
-        .galeria-minis { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
-        .mini { width: 60px; height: 40px; border-radius: 4px; cursor: pointer; border: 1px solid #555; object-fit: cover; }
+        /* Galería mejorada */
+        .galeria-minis { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+        .mini { 
+            width: 70px; height: 50px; border-radius: 4px; cursor: pointer; 
+            border: 2px solid transparent; object-fit: cover; transition: 0.2s;
+        }
+        .mini:hover { border-color: var(--oro); transform: scale(1.05); }
 
         .info-box { background: #000; padding: 15px; font-size: 0.85em; border-top: 1px solid #444; }
         .btn-wa {
             display: block; text-align: center; background: var(--verde); color: white;
-            text-decoration: none; padding: 10px; border-radius: 5px; margin-top: 8px; font-weight: bold;
+            text-decoration: none; padding: 12px; border-radius: 5px; margin-top: 8px; font-weight: bold;
         }
 
-        /* Franja de Auspiciantes */
+        /* Ventana Emergente (MODAL) */
+        #modal-visor {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 5000; justify-content: center; align-items: center;
+        }
+        #modal-img { max-width: 85%; max-height: 85%; border: 3px solid white; border-radius: 5px; }
+        #btn-cerrar {
+            position: absolute; top: 20px; right: 30px; color: white; font-size: 40px;
+            font-weight: bold; cursor: pointer;
+        }
+
         #auspiciantes {
             position: fixed; top: 0; right: 0; width: calc(100% - 300px);
             height: 60px; background: rgba(255,255,255,0.9);
             z-index: 1500; display: flex; align-items: center; justify-content: flex-end;
-            padding-right: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding-right: 20px;
         }
-        #auspiciantes span { color: #666; font-size: 11px; margin-right: 15px; font-weight: bold; }
         #auspiciantes img { height: 35px; margin-left: 15px; }
 
         @media (max-width: 600px) {
-            #sidebar { width: 100%; height: 45%; top: auto; bottom: 0; }
-            #auspiciantes { width: 100%; top: 0; left: 0; height: 50px; }
+            #sidebar { width: 100%; height: 45%; bottom: 0; top: auto; }
+            #auspiciantes { width: 100%; height: 45px; }
         }
     </style>
 </head>
 <body>
 
+    <div id="modal-visor">
+        <span id="btn-cerrar" onclick="cerrarDetalle()">&times;</span>
+        <img id="modal-img" src="">
+    </div>
+
     <div id="auspiciantes">
-        <span>ALIADOS ESTRATÉGICOS:</span>
-        <img src="logo1.png" alt="Auspiciante 1">
-        <img src="logo2.png" alt="Auspiciante 2">
+        <span style="color:#666; font-size: 11px; font-weight: bold;">ALIADOS:</span>
+        <img src="logo1.png">
+        <img src="logo2.png">
     </div>
 
     <div id="sidebar">
-        <div class="header-logo">
-            <img src="Gesin.png" alt="Logo Ges-in">
-        </div>
-
-        <a href="https://wa.me/593984180470?text=Hola%20Ges-in,%20quiero%20publicar%20mi%20terreno" class="btn-publicar" target="_blank">
-            ¡PUBLICA TU TERRENO AQUÍ!
-        </a>
-        
+        <div class="header-logo"><img src="Gesin.png"></div>
+        <a href="https://wa.me/593984180470?text=Quiero%20publicar%20mi%20terreno" class="btn-publicar" target="_blank">¡PUBLICA AQUÍ!</a>
         <div id="lista-propiedades"></div>
-
         <div class="info-box">
-            <h3 id="p-titulo" style="margin:0; color: var(--oro);">Seleccione propiedad</h3>
+            <h3 id="p-titulo" style="margin:0; color: var(--oro);">Cargando...</h3>
             <p id="p-desc" style="opacity: 0.8; margin: 8px 0;"></p>
-            <div id="p-specs" style="font-weight: bold; color: var(--azul);"></div>
-            
+            <div id="p-specs" style="color: var(--azul); font-weight: bold;"></div>
             <div class="galeria-minis" id="p-galeria"></div>
-
-            <a href="#" id="btn-whatsapp-link" class="btn-wa" target="_blank">Consultar por WhatsApp</a>
+            <a href="#" id="btn-whatsapp-link" class="btn-wa" target="_blank">WhatsApp</a>
         </div>
     </div>
 
-    <a-scene renderer="colorManagement: false; exposure: 1.2;">
+    <a-scene renderer="exposure: 1.2;">
         <a-assets>
             <img id="360_1" src="1.jpeg" crossorigin="anonymous">
             <img id="360_2" src="2.jpeg" crossorigin="anonymous">
             <img id="360_3" src="3.jpeg" crossorigin="anonymous">
         </a-assets>
-
         <a-sky id="main-sky" rotation="0 -90 0" shader="flat" src="#360_1"></a-sky>
-        
-        <a-entity camera look-controls>
-            <a-cursor color="var(--oro)"></a-cursor>
-        </a-entity>
+        <a-entity camera look-controls><a-cursor color="var(--oro)"></a-cursor></a-entity>
     </a-scene>
 
     <script>
-        const MI_WHATSAPP = "593984180470"; // Cambié el número al que tenías registrado
-
+        const MI_WHATSAPP = "593984180470";
         const catalogo = [
-            { 
-                titulo: "Propiedad Lote 1", 
-                desc: "Terreno con gran potencial en el Noroccidente.", 
-                specs: "Sector Pacto | 9 Ha", 
-                foto: "#360_1",
-                extras: ["a.jpg", "b.jpg"] // Fotos comunes asociadas
-            },
-            { 
-                titulo: "Propiedad Lote 2", 
-                desc: "Ubicación estratégica y servicios básicos.", 
-                specs: "Sector Centro | 600m2", 
-                foto: "#360_2",
-                extras: ["c.jpg", "d.jpg"]
-            },
-            { 
-                titulo: "Propiedad Lote 3", 
-                desc: "Espacio ideal para desarrollo comercial o vivienda.", 
-                specs: "Vía Principal", 
-                foto: "#360_3",
-                extras: ["a.jpg", "d.jpg"]
-            }
+            { titulo: "Propiedad Lote 1", desc: "Gran potencial agrícola.", specs: "Sector Pacto | 9 Ha", foto: "#360_1", extras: ["a.jpg", "b.jpg"] },
+            { titulo: "Propiedad Lote 2", desc: "Ubicación estratégica.", specs: "Sector Centro | 600m2", foto: "#360_2", extras: ["c.jpg", "d.jpg"] },
+            { titulo: "Propiedad Lote 3", desc: "Desarrollo comercial.", specs: "Vía Principal", foto: "#360_3", extras: ["a.jpg", "d.jpg"] }
         ];
-
-        const contenedor = document.getElementById('lista-propiedades');
-        const sky = document.querySelector('#main-sky');
 
         function renderizarMenu() {
             catalogo.forEach((item, index) => {
@@ -139,14 +121,13 @@
                 div.className = 'card';
                 div.innerHTML = `<strong>${item.titulo}</strong>`;
                 div.onclick = () => seleccionar(index, div);
-                contenedor.appendChild(div);
+                document.getElementById('lista-propiedades').appendChild(div);
             });
         }
 
         function seleccionar(index, elemento) {
             const p = catalogo[index];
-            sky.setAttribute('src', p.foto);
-            
+            document.querySelector('#main-sky').setAttribute('src', p.foto);
             document.getElementById('p-titulo').innerText = p.titulo;
             document.getElementById('p-desc').innerText = p.desc;
             document.getElementById('p-specs').innerText = p.specs;
@@ -157,21 +138,27 @@
                 const img = document.createElement('img');
                 img.src = imgUrl;
                 img.className = 'mini';
-                img.onclick = () => window.open(imgUrl, '_blank');
+                img.onclick = () => verDetalle(imgUrl); // Nueva función
                 galeria.appendChild(img);
             });
 
-            const mensaje = `Hola Ges-in, me interesa recibir más información sobre: ${p.titulo}`;
-            document.getElementById('btn-whatsapp-link').href = `https://wa.me/${MI_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
-
+            const msg = `Hola Ges-in, info sobre: ${p.titulo}`;
+            document.getElementById('btn-whatsapp-link').href = `https://wa.me/${MI_WHATSAPP}?text=${encodeURIComponent(msg)}`;
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             elemento.classList.add('active');
         }
 
-        window.onload = () => {
-            renderizarMenu();
-            seleccionar(0, document.querySelector('.card'));
-        };
+        // Funciones del Modal
+        function verDetalle(src) {
+            document.getElementById('modal-img').src = src;
+            document.getElementById('modal-visor').style.display = "flex";
+        }
+
+        function cerrarDetalle() {
+            document.getElementById('modal-visor').style.display = "none";
+        }
+
+        window.onload = () => { renderizarMenu(); seleccionar(0, document.querySelector('.card')); };
     </script>
 </body>
 </html>
