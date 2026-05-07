@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Ges-in | Catálogo 360 Pro</title>
+    <title>Ges-in | Catálogo 360 Nítido</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
         :root { --azul: #3498db; --oscuro: #1a1a1a; --oro: #f1c40f; }
@@ -37,12 +37,13 @@
         #loader {
             position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.7);
             color: var(--oro); padding: 8px 15px; border-radius: 20px; font-size: 12px; z-index: 3000;
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <div id="loader">Esperando selección...</div>
+    <div id="loader">Cargando...</div>
 
     <div id="sidebar">
         <div class="header-logo">
@@ -60,7 +61,17 @@
     </div>
 
     <a-scene renderer="antialias: true; colorManagement: true;">
-        <a-sky id="main-sky" rotation="0 -90 0" color="#111"></a-sky>
+        <a-assets>
+            <img id="img_mifoto" src="mifoto.jpeg" crossorigin="anonymous">
+            <img id="img_1" src="1.jpeg" crossorigin="anonymous">
+            <img id="img_2" src="2.jpeg" crossorigin="anonymous">
+        </a-assets>
+
+        <a-sky id="main-sky" 
+               rotation="0 -90 0" 
+               material="shader: flat; src: #img_mifoto" 
+               color="#FFF">
+        </a-sky>
         
         <a-entity camera look-controls="pointerLockEnabled: false">
             <a-cursor color="var(--oro)"></a-cursor>
@@ -73,19 +84,19 @@
                 titulo: "Oficina Matriz",
                 desc: "Sede administrativa de Gestiones Integrales.",
                 specs: "San Miguel de los Bancos",
-                archivo: "mifoto.jpeg" 
+                fotoId: "#img_mifoto" 
             },
             {
                 titulo: "Propiedad Lote 1",
                 desc: "Vista aérea capturada con DJI Mini 3.",
                 specs: "Sector Pacto | 9 Hectáreas",
-                archivo: "1.jpeg" 
+                fotoId: "#img_1" 
             },
             {
                 titulo: "Propiedad Lote 2",
                 desc: "Lote listo para desarrollo.",
                 specs: "Sector Centro | 600m²",
-                archivo: "2.jpeg" 
+                fotoId: "#img_2" 
             }
         ];
 
@@ -107,25 +118,21 @@
             const p = catalogo[index];
             loader.style.display = "block";
             loader.innerText = "Cargando panorama...";
-
-            // TRUCO PARA GITHUB: Forzamos la recarga del src
-            sky.setAttribute('src', ''); // Limpiamos primero
             
-            // Usamos una pequeña demora para asegurar que el motor gráfico procese el cambio
-            setTimeout(() => {
-                sky.setAttribute('src', p.archivo);
-                
-                // Actualizar interfaz
-                document.getElementById('p-titulo').innerText = p.titulo;
-                document.getElementById('p-desc').innerText = p.desc;
-                document.getElementById('p-specs').innerText = p.specs;
+            // Cambiar la foto usando el ID del asset
+            sky.setAttribute('material', 'src', p.fotoId);
+            
+            // Actualizar interfaz
+            document.getElementById('p-titulo').innerText = p.titulo;
+            document.getElementById('p-desc').innerText = p.desc;
+            document.getElementById('p-specs').innerText = p.specs;
 
-                // Estética del menú
-                document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-                elemento.classList.add('active');
-                
-                loader.innerText = "Vista: " + p.titulo;
-            }, 100);
+            // Estética del menú
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            elemento.classList.add('active');
+            
+            // Ocultar loader después de un momento
+            setTimeout(() => { loader.style.display = "none"; }, 1000);
         }
 
         window.onload = () => {
