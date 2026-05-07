@@ -2,41 +2,31 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Ges-in | Catálogo 360</title>
+    <title>Ges-in | Visualizador 360</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
         :root { --azul: #3498db; --oscuro: #1a1a1a; --oro: #f1c40f; }
-        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background-color: #000; }
 
         /* Panel Lateral */
         #sidebar {
-            position: fixed;
-            top: 0; left: 0; width: 300px; height: 100%;
-            background: var(--oscuro);
-            color: white;
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+            position: fixed; top: 0; left: 0; width: 280px; height: 100%;
+            background: var(--oscuro); color: white; z-index: 2000;
+            display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.5);
         }
 
         .header-logo { padding: 15px; text-align: center; background: white; }
-        .header-logo img { max-width: 150px; height: auto; }
+        .header-logo img { max-width: 140px; height: auto; }
 
         #lista-propiedades { flex-grow: 1; overflow-y: auto; padding: 15px; }
 
         .card {
-            background: #2c3e50;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            border-left: 4px solid transparent;
-            transition: 0.3s;
+            background: #2c3e50; padding: 12px; margin-bottom: 10px;
+            border-radius: 8px; cursor: pointer; border-left: 4px solid transparent;
         }
 
-        .card:hover { border-left-color: var(--oro); background: #34495e; }
-        .card.active { border-left-color: var(--azul); background: #34495e; }
+        .card:hover { background: #34495e; border-left-color: var(--oro); }
+        .card.active { background: #34495e; border-left-color: var(--azul); }
 
         .info-box { background: #000; padding: 15px; font-size: 0.85em; border-top: 1px solid #444; }
         
@@ -45,72 +35,67 @@
             text-decoration: none; padding: 10px; border-radius: 5px; margin-top: 8px; font-weight: bold;
         }
 
-        /* Aviso si algo falla */
-        #error-log {
-            position: fixed; bottom: 10px; right: 10px;
-            background: rgba(255,0,0,0.8); color: white;
-            padding: 5px 10px; font-size: 10px; z-index: 3000; display: none;
+        /* Mensaje de carga para el usuario */
+        #status-msg {
+            position: fixed; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.6); color: white;
+            padding: 5px 15px; border-radius: 20px; font-size: 12px; z-index: 3000;
         }
     </style>
 </head>
 <body>
 
-    <div id="error-log">Error cargando archivos...</div>
+    <div id="status-msg">Cargando experiencia...</div>
 
     <div id="sidebar">
         <div class="header-logo">
-            <img src="Gesin.png" alt="Gestiones Integrales">
+            <img src="Gesin.png" alt="Logo">
         </div>
         
         <div id="lista-propiedades"></div>
 
-        <div class="info-box" id="detalle-propiedad">
-            <h3 id="p-titulo" style="margin:0; color: var(--oro);">Cargando...</h3>
-            <p id="p-desc" style="opacity: 0.8; margin: 8px 0;">Ges-in facilitando tus trámites.</p>
+        <div class="info-box">
+            <h3 id="p-titulo" style="margin:0; color: var(--oro);">Gestiones Integrales</h3>
+            <p id="p-desc" style="opacity: 0.8; margin: 8px 0;">Seleccione un lote para visualizarlo en 360°.</p>
             <div id="p-specs" style="font-weight: bold; color: var(--azul); margin-bottom: 5px;"></div>
-            <a href="https://wa.me/tu_numero" class="btn-wa" target="_blank">WhatsApp</a>
+            <a href="https://wa.me/tu_numero" class="btn-wa" target="_blank">Consultar WhatsApp</a>
         </div>
     </div>
 
-    <a-scene embedded style="width: 100%; height: 100vh;">
-        <a-assets>
-            <img id="img_mifoto" src="mifoto.jpeg" crossorigin="anonymous">
-            <img id="img_1" src="1.jpeg" crossorigin="anonymous">
-            <img id="img_2" src="2.jpeg" crossorigin="anonymous">
-        </a-assets>
-
-        <a-sky id="main-sky" src="#img_mifoto" rotation="0 -90 0"></a-sky>
+    <a-scene loading-screen="dotsColor: gold; backgroundColor: black">
+        <a-sky id="main-sky" color="#333" rotation="0 -90 0"></a-sky>
         
-        <a-entity camera look-controls>
+        <a-entity camera look-controls="magicWindowTrackingEnabled: false">
             <a-cursor color="var(--oro)"></a-cursor>
         </a-entity>
     </a-scene>
 
     <script>
-        // BASE DE DATOS - Asegúrate de que los nombres coincidan con los de arriba
+        // CONFIGURACIÓN DE RUTAS - Verifica que los nombres en GitHub sean EXACTOS
         const catalogo = [
             {
                 titulo: "Oficina Matriz",
-                desc: "Sede principal Ges-in en San Miguel de los Bancos.",
-                specs: "Área: 45m² | Internet fibra",
-                fotoId: "#img_mifoto"
+                desc: "Sede administrativa en San Miguel de los Bancos.",
+                specs: "Matriz Ges-in",
+                archivo: "mifoto.jpeg" 
             },
             {
                 titulo: "Propiedad Lote 1",
-                desc: "Excelente ubicación con potencial agrícola.",
-                specs: "9 Hectáreas | Sector Pacto",
-                fotoId: "#img_1"
+                desc: "Terreno con gran proyección económica.",
+                specs: "Sector Pacto | 9 Ha",
+                archivo: "1.jpeg" 
             },
             {
                 titulo: "Propiedad Lote 2",
-                desc: "Terreno listo para construcción urbana.",
-                specs: "600m² | Servicios completos",
-                fotoId: "#img_2"
+                desc: "Lote urbano con servicios básicos.",
+                specs: "Sector Centro | 600m2",
+                archivo: "2.jpeg" 
             }
         ];
 
         const contenedor = document.getElementById('lista-propiedades');
-        const sky = document.getElementById('main-sky');
+        const sky = document.querySelector('#main-sky');
+        const status = document.getElementById('status-msg');
 
         function renderizarMenu() {
             catalogo.forEach((item, index) => {
@@ -124,31 +109,32 @@
 
         function seleccionar(index, elemento) {
             const p = catalogo[index];
+            status.innerText = "Cargando: " + p.archivo + "...";
             
-            // Cambiamos la foto usando el ID del asset
-            sky.setAttribute('src', p.fotoId);
+            // CAMBIO DIRECTO DE ATRIBUTO (Solución de compatibilidad)
+            sky.setAttribute('src', p.archivo);
             
-            // Actualizamos textos
+            // Actualizar Textos
             document.getElementById('p-titulo').innerText = p.titulo;
             document.getElementById('p-desc').innerText = p.desc;
             document.getElementById('p-specs').innerText = p.specs;
 
-            // Estilo del menú
+            // Clases de menú
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             elemento.classList.add('active');
+
+            // Quitar mensaje de carga tras un momento
+            setTimeout(() => { status.innerText = "Vista: " + p.titulo; }, 2000);
         }
 
-        // Iniciar todo
+        // Iniciar
         window.onload = () => {
             renderizarMenu();
-            seleccionar(0, document.querySelector('.card'));
+            // Intentar cargar la primera imagen
+            setTimeout(() => {
+                seleccionar(0, document.querySelector('.card'));
+            }, 500);
         };
-
-        // Detector de errores por si los nombres fallan
-        document.querySelector('a-assets').addEventListener('timeout', () => {
-            document.getElementById('error-log').style.display = 'block';
-            document.getElementById('error-log').innerText = "Error: Verifica los nombres .jpeg en GitHub";
-        });
     </script>
 </body>
 </html>
