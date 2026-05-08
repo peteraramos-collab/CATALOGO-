@@ -102,7 +102,12 @@
             <div class="galeria-minis" id="p-galeria"></div>
             <a href="#" id="btn-whatsapp-link" class="btn-wa" target="_blank">
                 <span>Contactar Asesor</span>
+                <!-- AÑADE ESTE NUEVO BOTÓN DE MAPA -->
+    <a href="#" id="btn-mapa-link" class="btn-wa" target="_blank" style="background: var(--azul); margin-top: 10px;">
+        <span>📍 Ver en Google Maps</span>
+    
             </a>
+            
         </div>
     </div>
 
@@ -199,7 +204,13 @@
             // WhatsApp
             const msg = `Hola Ges-in, solicito información de: ${p.titulo} ($${p.precio})`;
             document.getElementById('btn-whatsapp-link').href = `https://wa.me/${AGENTE_WA}?text=${encodeURIComponent(msg)}`;
-
+const btnMapa = document.getElementById('btn-mapa-link');
+    if (p.mapa) {
+        btnMapa.href = p.mapa;
+        btnMapa.style.display = 'flex'; // Mostrar si hay mapa
+    } else {
+        btnMapa.style.display = 'none'; // Ocultar si no hay mapa configurado
+    }
             // UI
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             elemento.classList.add('active');
