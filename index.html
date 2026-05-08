@@ -4,16 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     
-    <!-- PASO 3: METATAGS PARA WHATSAPP Y REDES SOCIALES -->
+    <!-- PASO 3: METATAGS PARA REDES SOCIALES Y WHATSAPP -->
     <title>Ges-in | Catálogo Inmobiliario 360°</title>
-    <meta name="description" content="Explora terrenos y propiedades en San Miguel de los Bancos con nuestros tours virtuales 360°.">
+    <meta name="description" content="Explora terrenos y proyectos en San Miguel de los Bancos con tours virtuales interactivos.">
     
-    <!-- Configuración para que el link se vea profesional en WhatsApp -->
-    <meta property="og:title" content="Ges-in | Tour Virtual de Propiedades">
-    <meta property="og:description" content="Haz clic para ver el catálogo interactivo de terrenos en San Miguel de los Bancos y Pacto.">
-    <meta property="og:image" content="Gesin.png"> <!-- Asegúrate de que esta imagen esté en tu carpeta principal -->
+    <!-- Configuración visual para el link (Open Graph) -->
+    <meta property="og:title" content="Ges-in | Propiedades Elite 360°">
+    <meta property="og:description" content="Visualiza tu próxima inversión con realidad virtual. Terrenos en San Miguel de los Bancos y Pacto.">
+    <meta property="og:image" content="Gesin.png"> <!-- Asegúrate que el logo se llame así -->
     <meta property="og:type" content="website">
 
+    <!-- Librería A-Frame para VR -->
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     
     <style>
@@ -23,9 +24,9 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; background: #000; }
+        body { overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; }
 
-        /* Panel Lateral */
+        /* Panel Lateral Izquierdo */
         #sidebar {
             position: fixed; top: 0; left: 0; width: 340px; height: 100%;
             background: linear-gradient(180deg, var(--oscuro) 0%, #1e272e 100%);
@@ -39,7 +40,7 @@
         .search-container { padding: 15px; background: rgba(255,255,255,0.05); }
         #search-input { 
             width: 100%; padding: 12px; border-radius: 25px; border: none; 
-            background: var(--gris); color: white; outline: none;
+            background: var(--gris); color: white; outline: none; font-size: 0.9em;
         }
 
         #lista-propiedades { flex-grow: 1; overflow-y: auto; padding: 15px; }
@@ -48,55 +49,54 @@
             background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 12px;
             border-radius: 12px; cursor: pointer; transition: 0.3s; border-left: 5px solid transparent;
         }
-        .card:hover { background: rgba(255,255,255,0.1); }
+        .card:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
         .card.active { border-left-color: var(--oro); background: rgba(52, 152, 219, 0.2); }
 
-        .info-box { background: rgba(0,0,0,0.9); padding: 20px; border-top: 3px solid var(--azul); }
-        .price-tag { font-size: 1.4em; color: var(--oro); font-weight: bold; margin-bottom: 5px; }
+        /* Cuadro de Información Inferior */
+        .info-box { background: rgba(0,0,0,0.95); padding: 20px; border-top: 3px solid var(--azul); }
+        .price-tag { font-size: 1.5em; color: var(--oro); font-weight: bold; margin-bottom: 5px; }
         
         .galeria-minis { display: flex; gap: 10px; margin: 15px 0; overflow-x: auto; padding-bottom: 10px; }
         .mini { width: 80px; height: 60px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
         .mini:hover { border-color: var(--oro); }
 
-        /* Botones de Acción */
+        /* Botones Estilizados */
         .btn-action {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             color: white; text-decoration: none; padding: 14px; border-radius: 8px; 
-            font-weight: bold; transition: 0.3s; margin-bottom: 8px; width: 100%;
+            font-weight: bold; transition: 0.3s; margin-bottom: 10px; width: 100%;
+            border: none; cursor: pointer; font-family: inherit;
         }
         .btn-wa { background: var(--verde); }
         .btn-mapa { background: var(--azul); }
-        .btn-action:hover { filter: brightness(1.1); transform: scale(1.02); }
+        .btn-action:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
-        /* Controles Escena */
-        #ui-controls { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px; }
-        .control-btn { 
-            background: rgba(0,0,0,0.6); color: white; border: 1px solid var(--oro);
-            padding: 10px; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; 
+        /* Botón Menú Móvil */
+        .toggle-mobile { 
+            display: none; position: fixed; top: 15px; left: 15px; z-index: 3000; 
+            background: var(--azul); border: none; color: white; padding: 12px; 
+            border-radius: 8px; font-weight: bold;
         }
 
         @media (max-width: 768px) {
             #sidebar { transform: translateX(-100%); width: 300px; }
             #sidebar.open { transform: translateX(0); }
-            .toggle-mobile { display: block !important; position: fixed; top: 15px; left: 15px; z-index: 3000; background: var(--azul); border: none; color: white; padding: 10px; border-radius: 5px; cursor: pointer; }
+            .toggle-mobile { display: block; }
         }
     </style>
 </head>
 <body>
 
-    <button class="toggle-mobile" style="display:none" onclick="toggleSidebar()">☰ Propiedades</button>
-
-    <div id="ui-controls">
-        <button class="control-btn" title="Pantalla Completa" onclick="document.documentElement.requestFullscreen()">⛶</button>
-    </div>
+    <button class="toggle-mobile" onclick="toggleSidebar()">☰ Ver Catálogo</button>
 
     <div id="sidebar">
         <div class="header-logo">
-            <img src="Gesin.png" alt="Ges-in Logo">
+            <img src="Gesin.png" alt="Ges-in" onerror="this.style.display='none'">
+            <h2 style="color: #333; margin-top: 5px;">Ges-in</h2>
         </div>
         
         <div class="search-container">
-            <input type="text" id="search-input" placeholder="🔍 Buscar propiedad o precio..." onkeyup="filtrarPropiedades()">
+            <input type="text" id="search-input" placeholder="🔍 Buscar por sector o precio..." onkeyup="filtrarPropiedades()">
         </div>
 
         <div id="lista-propiedades"></div>
@@ -104,65 +104,63 @@
         <div class="info-box">
             <div id="p-precio" class="price-tag"></div>
             <h3 id="p-titulo" style="color: var(--azul); margin-bottom: 5px;"></h3>
-            <p id="p-desc" style="font-size: 0.85em; color: #ccc; margin-bottom: 15px;"></p>
+            <p id="p-desc" style="font-size: 0.85em; color: #ccc; margin-bottom: 15px; line-height: 1.4;"></p>
             
             <div class="galeria-minis" id="p-galeria"></div>
             
-            <!-- Botón WhatsApp -->
             <a href="#" id="btn-whatsapp-link" class="btn-action btn-wa" target="_blank">
-                💬 Contactar por WhatsApp
+                💬 Contactar Asesor
             </a>
 
-            <!-- Botón Mapa (Paso 2) -->
             <a href="#" id="btn-mapa-link" class="btn-action btn-mapa" target="_blank">
-                📍 Ver en Google Maps
+                📍 Ver Ubicación Exacta
             </a>
         </div>
     </div>
 
-    <!-- Escena 360 -->
-    <a-scene loading-screen="dotsColor: #f1c40f; backgroundColor: black" renderer="antialias: true;">
+    <!-- Escena de Realidad Virtual -->
+    <a-scene loading-screen="dotsColor: #f1c40f; backgroundColor: #121212" renderer="antialias: true;">
         <a-assets>
-            <!-- Imágenes 360° -->
+            <!-- Asegúrate de que estos nombres de archivos coincidan con tus archivos en la carpeta -->
             <img id="360_1" src="1.jpeg">
             <img id="360_2" src="2.jpeg">
             <img id="360_3" src="mifoto.jpeg">
         </a-assets>
 
-        <a-sky id="main-sky" src="#360_1" animation__fade="property: components.material.material.opacity; from: 0; to: 1; dur: 500"></a-sky>
+        <a-sky id="main-sky" radius="100" src="#360_1" animation__fade="property: components.material.material.opacity; from: 0; to: 1; dur: 500"></a-sky>
 
         <a-entity id="hotspots-container"></a-entity>
 
         <a-entity camera look-controls position="0 1.6 0">
-            <a-cursor color="#f1c40f"></a-cursor>
+            <a-cursor color="#f1c40f" fuse="false" raycaster="objects: .clickable"></a-cursor>
         </a-entity>
     </a-scene>
 
     <script>
         const AGENTE_WA = "593995042091";
 
-        // BASE DE DATOS ACTUALIZADA CON ENLACES DE MAPA
+        // BASE DE DATOS CON TUS LINKS DE GOOGLE MAPS
         const catalogo = [
             { 
                 titulo: "🌄 Hacienda El Pacto", sector: "Pacto", precio: 45000, 
-                desc: "9 Hectáreas con vista panorámica. Incluye vertiente de agua propia.",
+                desc: "Extenso terreno ideal para agricultura o desarrollo turístico con vistas privilegiadas.",
                 foto: "#360_1", extras: ["a.jpg", "b.jpg"],
-                mapa: "https://goo.gl/maps/tu_enlace_pacto_aqui", // Reemplaza con tu link real
-                hotspots: [{pos: "5 2 -10", msg: "Límite del terreno"}]
+                mapa: "https://maps.app.goo.gl/5uY6cs62Q182YEwV6",
+                hotspots: [{pos: "10 2 -15", msg: "Límite Norte"}]
             },
             { 
                 titulo: "🏢 Lote Urbano Bancos", sector: "San Miguel", precio: 120000, 
-                desc: "600m2 en el centro de San Miguel de los Bancos. Ideal comercial.",
+                desc: "Ubicación estratégica en el centro de la ciudad. Alta plusvalía y listo para construir.",
                 foto: "#360_2", extras: ["c.jpg", "d.jpg"],
-                mapa: "https://goo.gl/maps/tu_enlace_bancos_aqui", // Reemplaza con tu link real
-                hotspots: [{pos: "0 1.5 -8", msg: "Acceso principal"}]
+                mapa: "https://maps.app.goo.gl/edmdTUW8C1ZQEQVh8",
+                hotspots: [{pos: "-5 1.5 -10", msg: "Acceso Comercial"}]
             },
             { 
-                titulo: "🏞️ Reserva Ecológica", sector: "Pacto", precio: 85000, 
-                desc: "Propiedad con bosque primario y senderos. Ideal para ecoturismo.",
+                titulo: "🏞️ Quinta La Reserva", sector: "Pacto", precio: 85000, 
+                desc: "Un paraíso natural con acceso a senderos y clima subtropical único.",
                 foto: "#360_3", extras: ["a.jpg", "c.jpg"],
-                mapa: "https://goo.gl/maps/tu_enlace_reserva_aqui", // Reemplaza con tu link real
-                hotspots: [{pos: "8 3 5", msg: "Mirador de Aves"}]
+                mapa: "https://maps.app.goo.gl/4BFEYtUx6BmP4kt97",
+                hotspots: [{pos: "15 5 0", msg: "Zona de Mirador"}]
             }
         ];
 
@@ -188,29 +186,31 @@
         }
 
         function seleccionar(p, elemento) {
-            // Cambio de imagen 360
-            document.querySelector('#main-sky').setAttribute('src', p.foto);
+            // Cambio suave de la imagen 360
+            const sky = document.querySelector('#main-sky');
+            sky.setAttribute('src', p.foto);
             
-            // Actualizar Textos
+            // Actualizar Textos del Panel
             document.getElementById('p-titulo').innerText = p.titulo;
             document.getElementById('p-precio').innerText = `$${p.precio.toLocaleString()}`;
             document.getElementById('p-desc').innerText = p.desc;
             
-            // Generar Minigaleria
+            // Generar Miniaturas de Galería
             const gal = document.getElementById('p-galeria');
             gal.innerHTML = '';
             p.extras.forEach(img => {
                 const m = document.createElement('img');
                 m.src = img; m.className = 'mini';
-                m.onerror = () => m.src = "https://via.placeholder.com/80x60?text=Ges-in";
+                // Si la imagen extra no existe, ponemos una de respaldo
+                m.onerror = () => m.src = "https://via.placeholder.com/80x60?text=Gesin";
                 gal.appendChild(m);
             });
 
-            // Actualizar Link WhatsApp
-            const msg = `Hola Ges-in, solicito información de: ${p.titulo} ($${p.precio})`;
+            // Actualizar Enlace de WhatsApp
+            const msg = `Hola Ges-in, me interesa la propiedad: ${p.titulo} ($${p.precio})`;
             document.getElementById('btn-whatsapp-link').href = `https://wa.me/${AGENTE_WA}?text=${encodeURIComponent(msg)}`;
 
-            // ACTUALIZAR LINK MAPA (Paso 2)
+            // Actualizar Enlace de Google Maps
             const btnMapa = document.getElementById('btn-mapa-link');
             if(p.mapa) {
                 btnMapa.href = p.mapa;
@@ -219,16 +219,20 @@
                 btnMapa.style.display = 'none';
             }
 
-            // UI Activa
+            // Marcar propiedad como activa en la lista
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             if(elemento) elemento.classList.add('active');
         }
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function toggleSidebar() { 
+            document.getElementById('sidebar').classList.toggle('open'); 
+        }
 
+        // Carga inicial
         window.onload = () => {
             renderizar(catalogo);
-            seleccionar(catalogo[0], document.querySelector('.card'));
+            // Seleccionar la primera por defecto
+            if(catalogo.length > 0) seleccionar(catalogo[0], document.querySelector('.card'));
         };
     </script>
 </body>
